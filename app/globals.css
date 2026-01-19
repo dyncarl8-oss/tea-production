@@ -14,7 +14,7 @@
    ============================================ */
 
 @theme {
-  /* Slate/Zinc Palette for Dashboard Feel */
+  /* Slate/Zinc Palette for Professional Dashboard */
   --color-primary-50:  #f0f9ff;
   --color-primary-100: #e0f2fe;
   --color-primary-200: #bae6fd;
@@ -41,8 +41,8 @@
 }
 
 :root {
-  /* Default Light Mode Colors - Higher Contrast */
-  --background: #f1f5f9; /* Slate-100 */
+  /* High Contrast Light Mode */
+  --background: #f8fafc; /* Slate-50 */
   --foreground: #0f172a; /* Slate-900 */
   
   --card-bg: #ffffff;
@@ -52,24 +52,28 @@
   --sidebar-bg: #ffffff;
   --sidebar-border: #e2e8f0;
   
-  --primary-glow: rgba(14, 165, 233, 0.2);
+  --primary-glow: rgba(14, 165, 233, 0.15);
+  --success-glow: rgba(16, 185, 129, 0.15);
+  
+  --radius-lg: 0.75rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.375rem;
 }
 
 .dark {
-  /* Dark Mode Colors - Deep Blue/Gray Dashboard */
+  /* Deep Blue/Gray Dark Mode - "Command Center" feel */
   --background: #020617; /* Slate-950 */
-  --foreground: #f8fafc; /* Slate-50 */
+  --foreground: #f1f5f9; /* Slate-100 */
   
-  --card-bg: #0f172a;
-  --card-border: #1e293b;
-  --card-hover-border: #475569;
+  --card-bg: #0f172a; /* Slate-900 */
+  --card-border: #1e293b; /* Slate-800 */
+  --card-hover-border: #334155; /* Slate-700 */
   
   --sidebar-bg: #0f172a;
   --sidebar-border: #1e293b;
   
-  --primary-glow: rgba(56, 189, 248, 0.2);
-
-  /* Override primitives for dark mode if needed via CSS variables mapped here */
+  --primary-glow: rgba(56, 189, 248, 0.15);
+  --success-glow: rgba(52, 211, 153, 0.15);
 }
 
 /* Base Styles */
@@ -80,6 +84,28 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-300);
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-700);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neutral-400);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neutral-600);
 }
 
 /* ============================================

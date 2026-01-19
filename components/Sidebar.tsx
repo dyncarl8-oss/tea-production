@@ -150,17 +150,19 @@ export function Sidebar({ role, companyId, userName, userAvatar }: SidebarProps)
 
       {/* User info */}
       {userName && (
-        <div className="flex items-center gap-3 p-3 mb-6 rounded-xl bg-neutral-50">
-          <div className="avatar">
+        <div className="flex items-center gap-3 p-3 mb-6 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+          <div className="avatar w-10 h-10 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-700 flex-shrink-0">
             {userAvatar ? (
-              <img src={userAvatar} alt={userName} />
+              <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
             ) : (
-              userName.charAt(0).toUpperCase()
+              <span className="w-full h-full flex items-center justify-center text-sm font-bold text-neutral-500 dark:text-neutral-400">
+                {userName.charAt(0).toUpperCase()}
+              </span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm text-neutral-900 truncate">{userName}</p>
-            <p className="text-xs text-neutral-500 capitalize">{role}</p>
+            <p className="font-medium text-sm text-foreground truncate">{userName}</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 capitalize">{role}</p>
           </div>
         </div>
       )}
