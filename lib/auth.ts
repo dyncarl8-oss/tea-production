@@ -50,11 +50,11 @@ export async function getCurrentUser(companyId?: string): Promise<AuthResult | n
       const access = await whopsdk.users.checkAccess(companyId, { id: userId });
       
       // Check if user is an admin (team member)
-      if (access.has_valid_membership || access.is_admin) {
+      if (access.has_access || access.access_level === 'admin') {
         hasAccess = true;
         
         // Check for admin access first
-        if (access.is_admin) {
+        if (access.access_level === 'admin') {
           role = 'admin';
         } else {
           // Check for affiliate status
@@ -90,7 +90,7 @@ async function checkAffiliateAccess(userId: string, companyId: string): Promise<
     // For now, we'll use a simple membership check
     for (const resourceId of AFFILIATE_RESOURCE_IDS) {
       const access = await whopsdk.users.checkAccess(resourceId, { id: userId });
-      if (access.has_valid_membership) {
+      if (access.has_access) {
         return true;
       }
     }

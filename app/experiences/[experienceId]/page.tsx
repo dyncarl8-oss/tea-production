@@ -21,9 +21,9 @@ export default async function ExperiencePage({
 		]);
 
 		// Determine role and redirect accordingly
-		if (access.is_admin) {
+		if (access.access_level === 'admin') {
 			redirect('/admin');
-		} else if (access.has_valid_membership) {
+		} else if (access.has_access) {
 			redirect('/circle');
 		} else {
 			redirect('/stems');

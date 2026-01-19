@@ -73,7 +73,7 @@ export function RoleBadge({ role, className = '' }: RoleBadgeProps) {
 
 // Status Badge
 interface StatusBadgeProps {
-  status: 'active' | 'pending' | 'completed' | 'failed' | 'paused';
+  status: 'active' | 'pending' | 'completed' | 'failed' | 'paused' | 'approved' | 'paid';
   className?: string;
 }
 
@@ -84,9 +84,11 @@ export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
     completed: { variant: 'primary' as const, label: 'Completed' },
     failed: { variant: 'danger' as const, label: 'Failed' },
     paused: { variant: 'default' as const, label: 'Paused' },
+    approved: { variant: 'success' as const, label: 'Approved' },
+    paid: { variant: 'success' as const, label: 'Paid' },
   };
 
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig.pending; // Fallback to pending if unknown
 
   return (
     <Badge variant={config.variant} dot className={className}>
