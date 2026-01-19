@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from 'next-themes';
+import { useState, useEffect } from 'react';
 import type { UserRole } from '@/lib/types';
 
 interface SidebarProps {
@@ -226,20 +228,70 @@ export function Sidebar({ role, companyId, userName, userAvatar }: SidebarProps)
         )}
       </nav>
 
-      {/* Symptom Tool Link */}
-      <div className="mt-auto pt-6 border-t border-neutral-200">
+      {/* Theme Toggle & Symptom Tool */}
+      <div className="mt-auto pt-6 border-t border-neutral-200 dark:border-neutral-800 space-y-4">
+        <ThemeToggle />
+        
         <Link
           href="/stems"
-          className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 transition-colors"
+          className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 transition-colors border border-teal-100 dark:border-teal-900 dark:from-teal-900/20 dark:to-emerald-900/20"
         >
           <span className="text-2xl">🌱</span>
           <div>
-            <p className="font-medium text-sm text-neutral-900">Symptom-to-Stems</p>
-            <p className="text-xs text-neutral-500">Get personalized blends</p>
+            <p className="font-medium text-sm text-neutral-900 dark:text-neutral-200">Symptom-to-Stems</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">Get personalized blends</p>
           </div>
         </Link>
       </div>
     </aside>
+  );
+}
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="h-10 w-full bg-neutral-100 dark:bg-neutral-800 rounded-lg animate-pulse" />;
+  }
+
+  return (
+    <button
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      className="w-full flex items-center justify-between p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+    >
+      <div className="flex items-center gap-2">
+        <div className={`p-1.5 rounded-md ${theme === 'light' ? 'bg-white shadow-sm text-amber-500' : 'text-neutral-500'}`}>
+          <SunIcon />
+        </div>
+        <div className={`p-1.5 rounded-md ${theme === 'dark' ? 'bg-neutral-700 shadow-sm text-blue-400' : 'text-neutral-500'}`}>
+          <MoonIcon />
+        </div>
+      </div>
+      <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400 pr-2">
+        {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+      </span>
+    </button>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
   );
 }
 

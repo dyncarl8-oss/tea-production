@@ -46,8 +46,14 @@ export async function getCurrentUser(companyId?: string): Promise<AuthResult | n
     let role: UserRole = 'visitor';
     let hasAccess = false;
 
+    // Log initial user retrieval
+    console.log(`[AUTH] Retrieved User: ${userId}`, { name: user.name, username: user.username });
+
     if (companyId) {
       const access = await whopsdk.users.checkAccess(companyId, { id: userId });
+      
+      // Log raw access response
+      console.log(`[AUTH] CheckAccess Response for ${companyId}:`, JSON.stringify(access, null, 2));
       
       // Check if user is an admin (team member)
       if (access.has_access || access.access_level === 'admin') {
@@ -67,6 +73,8 @@ export async function getCurrentUser(companyId?: string): Promise<AuthResult | n
         }
       }
     }
+    
+    console.log(`[AUTH] Final Resolved Role: ${role} | HasAccess: ${hasAccess}`);
 
     return {
       userId,
