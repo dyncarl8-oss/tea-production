@@ -1,0 +1,35 @@
+the basics
+https://docs.whop.com/developer/getting-started
+https://docs.whop.com/developer/guides/permissions
+https://docs.whop.com/developer/guides/authentication
+https://docs.whop.com/developer/guides/app-views
+
+https://docs.whop.com/developer/api/getting-started
+
+
+
+https://docs.whop.com/developer/guides/accept-payments
+
+
+
+IDENTITY
+
+users:
+https://docs.whop.com/api-reference/users/retrieve-user
+https://docs.whop.com/api-reference/users/check-access
+
+companies:
+https://docs.whop.com/api-reference/companies/list-companies
+https://docs.whop.com/api-reference/companies/create-company
+https://docs.whop.com/api-reference/companies/retrieve-company
+
+
+authorized users:
+https://docs.whop.com/api-reference/authorized-users/list-authorized-users
+https://docs.whop.com/api-reference/authorized-users/retrieve-authorized-user
+
+CRM
+
+members:
+https://docs.whop.com/api-reference/members/list-members
+https://docs.whop.com/api-reference/members/retrieve-member
