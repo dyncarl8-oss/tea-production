@@ -1,287 +1,133 @@
 import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { whopsdk } from '@/lib/whop-sdk';
-import { courses, commissionSettings } from '@/lib/data';
 import { Sidebar } from '@/components/Sidebar';
-import { Card, StatCard } from '@/components/Card';
-import { LinkButton, Button } from '@/components/Button';
-import { Badge } from '@/components/Badge';
-import { Progress } from '@/components/Progress';
 
-export default async function AdminDashboard() {
+export default async function AdminPage() {
   let userId: string;
   let user: any;
-  const role: 'admin' | 'member' | 'affiliate' = 'admin';
+  let role: 'admin' | 'member' | 'affiliate' | 'visitor' = 'visitor';
 
   try {
     const headersList = await headers();
     const verification = await whopsdk.verifyUserToken(headersList);
     userId = verification.userId;
     user = await whopsdk.users.retrieve(userId);
+    
+    // In real app, check roles specifically via Whop or DB
+    // For MVP, we'll assume entry to this route is gated by whop-level permissions
+    role = 'admin';
   } catch (error) {
-    userId = 'admin-user';
-    user = { name: 'Admin', username: 'admin' };
+    // This is the functional redirect requirement from WHAT TO BUILD.txt
+    redirect('/circle');
   }
 
-  const displayName = user?.name || `@${user?.username}` || 'Admin';
-
-  // Mock admin stats
-  const stats = {
-    totalUsers: 1247,
-    totalMembers: 856,
-    totalAffiliates: 124,
-    newUsersThisWeek: 47,
-    totalRevenue: 45680.00,
-    revenueThisMonth: 12450.00,
-    activeSubscriptions: 743,
-    totalCourses: courses.length,
-    totalLessons: 45,
-    avgCompletionRate: 67,
-    affiliatePayouts: 3250.00,
-    pendingPayouts: 890.00,
-  };
-
-  // Mock recent activity
-  const recentActivity = [
-    { id: '1', type: 'signup', message: 'New member: Sarah M.', time: '2 min ago', icon: '👤' },
-    { id: '2', type: 'purchase', message: 'Product sold: Calm Shores Blend', time: '5 min ago', icon: '💰' },
-    { id: '3', type: 'affiliate', message: 'New affiliate signup: James T.', time: '15 min ago', icon: '💎' },
-    { id: '4', type: 'subscription', message: 'New subscription: Lisa R.', time: '32 min ago', icon: '🔄' },
-    { id: '5', type: 'completion', message: 'Course completed: Herbal Foundations', time: '1 hour ago', icon: '🎓' },
-    { id: '6', type: 'payout', message: 'Affiliate payout processed: $450', time: '2 hours ago', icon: '💳' },
-  ];
+  const displayName = user?.name || user?.username || 'Admin';
+  const avatarUrl = user?.profile_picture?.url || null;
 
   return (
-    <div className="flex">
-      <Sidebar role={role} userName={displayName} />
+    <div className="flex h-screen overflow-hidden bg-background text-foreground transition-colors duration-500">
+      <Sidebar role={role} userName={displayName} userAvatar={avatarUrl} />
       
-      <main className="main-content">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-              Admin Dashboard 🔧
-            </h1>
-            <p className="text-neutral-600">
-              Monitor your platform, manage users, and track revenue.
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-              </svg>
-              Export Data
-            </Button>
-            <Button>
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Create Content
-            </Button>
-          </div>
-        </div>
-
-        {/* Key Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            title="Total Revenue"
-            value={`$${stats.totalRevenue.toLocaleString()}`}
-            change={{ value: 18, type: 'increase' }}
-            icon={
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-          />
-          <StatCard
-            title="Active Members"
-            value={stats.totalMembers.toLocaleString()}
-            change={{ value: 12, type: 'increase' }}
-            icon={
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            }
-          />
-          <StatCard
-            title="Active Affiliates"
-            value={stats.totalAffiliates}
-            change={{ value: 8, type: 'increase' }}
-            icon={
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            }
-          />
-          <StatCard
-            title="Completion Rate"
-            value={`${stats.avgCompletionRate}%`}
-            change={{ value: 5, type: 'increase' }}
-            icon={
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            }
-          />
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Revenue Overview */}
-            <Card>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-neutral-900">Revenue Overview</h2>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="sm">Week</Button>
-                  <Button variant="secondary" size="sm">Month</Button>
-                  <Button variant="ghost" size="sm">Year</Button>
-                </div>
-              </div>
-              
-              {/* Mock Chart Placeholder */}
-              <div className="h-64 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-xl flex items-center justify-center mb-6">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">📊</div>
-                  <p className="text-neutral-500">Revenue Chart</p>
-                  <p className="text-2xl font-bold text-teal-600 mt-2">${stats.revenueThisMonth.toLocaleString()}</p>
-                  <p className="text-sm text-neutral-400">This month</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-6">
-                <div className="text-center p-4 bg-neutral-50 rounded-xl">
-                  <p className="text-sm text-neutral-500 mb-1">Products</p>
-                  <p className="text-xl font-bold text-neutral-900">$5,240</p>
-                </div>
-                <div className="text-center p-4 bg-neutral-50 rounded-xl">
-                  <p className="text-sm text-neutral-500 mb-1">Subscriptions</p>
-                  <p className="text-xl font-bold text-neutral-900">$6,890</p>
-                </div>
-                <div className="text-center p-4 bg-neutral-50 rounded-xl">
-                  <p className="text-sm text-neutral-500 mb-1">Affiliate Payouts</p>
-                  <p className="text-xl font-bold text-red-500">-$320</p>
-                </div>
-              </div>
-            </Card>
-
-            {/* Quick Actions */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <LinkButton href="/admin/users" variant="secondary" className="flex-col h-24 gap-2">
-                <svg className="w-8 h-8 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span className="text-sm">Manage Users</span>
-              </LinkButton>
-              <LinkButton href="/admin/content" variant="secondary" className="flex-col h-24 gap-2">
-                <svg className="w-8 h-8 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span className="text-sm">Content</span>
-              </LinkButton>
-              <LinkButton href="/admin/stems" variant="secondary" className="flex-col h-24 gap-2">
-                <svg className="w-8 h-8 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-                <span className="text-sm">Stems Mappings</span>
-              </LinkButton>
-              <LinkButton href="/admin/commissions" variant="secondary" className="flex-col h-24 gap-2">
-                <svg className="w-8 h-8 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-sm">Commissions</span>
-              </LinkButton>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+        <div className="max-w-6xl mx-auto space-y-8">
+          
+          {/* Header */}
+          <div className="pb-6 border-b border-border flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h1 className="h1-dense uppercase italic tracking-tighter text-4xl">System Admin</h1>
+              <p className="sub-dense">Manage the Steep Circle ecosystem growth and content.</p>
             </div>
+            <div className="flex gap-2">
+               <span className="badge-frosted badge-blue uppercase text-[9px] font-black italic">V.0.2.0 ALPHA</span>
+               <span className="badge-frosted border-red-500/20 text-red-500 bg-red-500/10 uppercase text-[9px] font-black italic">LIVE MODE</span>
+            </div>
+          </div>
 
-            {/* Content Stats */}
-            <Card>
-              <h2 className="text-lg font-semibold text-neutral-900 mb-6">Content Performance</h2>
-              <div className="space-y-4">
-                {courses.slice(0, 4).map((course, idx) => (
-                  <div key={course.id} className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-100 to-emerald-100 flex items-center justify-center text-xl">
-                      {idx === 0 ? '🌿' : idx === 1 ? '☀️' : idx === 2 ? '💼' : '🎓'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-neutral-900 truncate">{course.title}</p>
-                      <p className="text-sm text-neutral-500">{course.lessonCount} lessons</p>
-                    </div>
-                    <div className="w-32">
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-neutral-400">Completion</span>
-                        <span className="font-medium">{70 - idx * 15}%</span>
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+             {[
+               { label: 'Total Members', value: '1,280', delta: '+12%', color: 'text-orange-500' },
+               { label: 'Growth Leads', value: '452', delta: '+5%', color: 'text-blue-500' },
+               { label: 'Revenue (MRR)', value: '$12,450', delta: '+18%', color: 'text-green-500' },
+               { label: 'Support Tickets', value: '3', delta: 'Active', color: 'text-red-500' }
+             ].map(stat => (
+               <div key={stat.label} className="frosted-card p-4 border-white/5">
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted mb-1 italic">{stat.label}</p>
+                  <p className={`text-2xl font-black italic tracking-tighter ${stat.color}`}>{stat.value}</p>
+                  <span className="text-[8px] font-bold text-muted uppercase tracking-widest">{stat.delta} VS LAST MONTH</span>
+               </div>
+             ))}
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+             {/* User Management Section */}
+             <div className="lg:col-span-2 space-y-6">
+                <div className="frosted-card overflow-hidden">
+                   <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+                      <h3 className="font-black text-[10px] uppercase tracking-widest italic tracking-[0.2em]">Active Member Roster</h3>
+                      <button className="badge-frosted badge-orange uppercase text-[8px] font-black">Export CSV</button>
+                   </div>
+                   <div className="p-0">
+                      <table className="w-full text-left text-[11px]">
+                         <thead>
+                            <tr className="border-b border-white/5 text-muted uppercase tracking-widest font-black italic">
+                               <th className="p-4">Identity</th>
+                               <th className="p-4">Role</th>
+                               <th className="p-4 text-right">Action</th>
+                            </tr>
+                         </thead>
+                         <tbody className="font-medium italic">
+                            {[
+                              { name: 'Darian Thompson', role: 'Affiliate', status: 'Online' },
+                              { name: 'Leila Smith', role: 'Member', status: 'Offline' },
+                              { name: 'Zion Carter', role: 'Admin', status: 'Online' }
+                            ].map(u => (
+                              <tr key={u.name} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                 <td className="p-4 flex items-center gap-3">
+                                    <div className="w-6 h-6 rounded bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-[8px] uppercase">{u.name.charAt(0)}</div>
+                                    {u.name}
+                                 </td>
+                                 <td className="p-4 uppercase tracking-widest text-[9px] font-black opacity-60">{u.role}</td>
+                                 <td className="p-4 text-right">
+                                    <button className="text-orange-500 font-black uppercase text-[9px] hover:underline">Manage</button>
+                                 </td>
+                              </tr>
+                            ))}
+                         </tbody>
+                      </table>
+                   </div>
+                </div>
+             </div>
+
+             {/* System Controls */}
+             <div className="space-y-6">
+                <div className="frosted-card p-6 bg-gradient-to-br from-orange-500/5 to-transparent">
+                   <h3 className="font-black text-[10px] uppercase tracking-widest italic text-orange-500 mb-6 tracking-[0.2em]">Growth Controls</h3>
+                   <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-black/20 border border-white/5">
+                         <span className="text-[10px] font-black uppercase italic tracking-tighter">Affiliate auto-enroll</span>
+                         <div className="w-8 h-4 bg-orange-500 rounded-full relative">
+                            <div className="absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full shadow-lg" />
+                         </div>
                       </div>
-                      <Progress value={70 - idx * 15} size="sm" />
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-neutral-900">{245 - idx * 30}</p>
-                      <p className="text-xs text-neutral-400">enrollments</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-black/20 border border-white/5">
+                         <span className="text-[10px] font-black uppercase italic tracking-tighter">Trial mode (7 Days)</span>
+                         <div className="w-8 h-4 bg-zinc-700 rounded-full relative">
+                            <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-white/40 rounded-full shadow-lg" />
+                         </div>
+                      </div>
+                   </div>
+                </div>
+
+                <div className="frosted-card p-6 border-blue-500/10">
+                   <h3 className="font-black text-[10px] uppercase tracking-widest italic text-blue-500 mb-4 tracking-[0.2em]">Content Engine</h3>
+                   <button className="btn-vibrant !w-full !from-blue-600 !to-indigo-600 !py-3 !text-[10px] uppercase tracking-widest mb-3">Sync Stems Map</button>
+                   <button className="btn-vibrant !w-full !from-zinc-700 !to-zinc-900 border border-white/5 !py-3 !text-[10px] uppercase tracking-widest">Update Library</button>
+                </div>
+             </div>
           </div>
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Recent Activity */}
-            <Card>
-              <h3 className="font-semibold text-neutral-900 mb-4">Recent Activity</h3>
-              <div className="space-y-4 max-h-80 overflow-y-auto">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0">
-                      {activity.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-neutral-900 truncate">{activity.message}</p>
-                      <p className="text-xs text-neutral-400">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Affiliate Payouts */}
-            <Card className="bg-amber-50 border-amber-200">
-              <h3 className="font-semibold text-amber-900 mb-4 flex items-center gap-2">
-                <span>💳</span> Pending Payouts
-              </h3>
-              <div className="text-3xl font-bold text-amber-800 mb-2">
-                ${stats.pendingPayouts.toLocaleString()}
-              </div>
-              <p className="text-sm text-amber-700 mb-4">
-                12 affiliates pending payout
-              </p>
-              <Button variant="outline" fullWidth>
-                Process Payouts
-              </Button>
-            </Card>
-
-            {/* Commission Settings */}
-            <Card>
-              <h3 className="font-semibold text-neutral-900 mb-4">Commission Settings</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-neutral-50 rounded-lg">
-                  <span className="text-sm text-neutral-600">Product Rate</span>
-                  <Badge variant="primary">{commissionSettings.productCommissionRate}%</Badge>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-neutral-50 rounded-lg">
-                  <span className="text-sm text-neutral-600">Subscription Rate</span>
-                  <Badge variant="primary">{commissionSettings.subscriptionCommissionRate}%</Badge>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-neutral-50 rounded-lg">
-                  <span className="text-sm text-neutral-600">Min Payout</span>
-                  <Badge variant="default">${commissionSettings.minimumPayout}</Badge>
-                </div>
-              </div>
-              <LinkButton href="/admin/commissions" variant="ghost" size="sm" fullWidth className="mt-4">
-                Edit Settings
-              </LinkButton>
-            </Card>
-          </div>
         </div>
       </main>
     </div>
