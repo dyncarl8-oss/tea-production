@@ -2,9 +2,6 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { whopsdk } from '@/lib/whop-sdk';
 import { Sidebar } from '@/components/Sidebar';
-import { Card, StatCard } from '@/components/Card';
-import { LinkButton } from '@/components/Button';
-import { Badge } from '@/components/Badge';
 
 export default async function AffiliateDashboard() {
   // 1. Verify User Authentication (Server-Side)
@@ -17,12 +14,8 @@ export default async function AffiliateDashboard() {
     const verification = await whopsdk.verifyUserToken(headersList);
     userId = verification.userId;
     user = await whopsdk.users.retrieve(userId);
-    
     console.log(`[AFFILIATE] Auth Verified - UserID: ${userId} | Name: ${user.name || user.username}`);
-    
-    // In real app, check affiliate resource access here
     role = 'affiliate';
-
   } catch (error) {
     console.error('[AFFILIATE] Auth Failed:', error);
     redirect('/stems');
@@ -40,54 +33,46 @@ export default async function AffiliateDashboard() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
+    <div className="flex h-screen overflow-hidden bg-background text-foreground transition-colors duration-500">
       <Sidebar 
         role={role} 
         userName={displayName} 
         userAvatar={avatarUrl}
       />
       
-      <main className="flex-1 overflow-y-auto p-4 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+        <div className="max-w-6xl mx-auto space-y-6">
           
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Affiliate Dashboard 💎</h1>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                Track your earnings and grow your wellness business.
-              </p>
+              <h1 className="h1-dense">Affiliate Dashboard</h1>
+              <p className="sub-dense">Manage your referrals and track your wellness earnings.</p>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant="warning" size="lg" dot>
-                 Gold Partner
-              </Badge>
+              <span className="badge-frosted badge-orange">Gold Level Partner 💎</span>
+              <button className="btn-vibrant">Export Report</button>
             </div>
           </div>
 
-          {/* KPI Grid */}
+          {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <StatCard
-              title="Total Earnings"
-              value={`$${stats.earnings.toLocaleString()}`}
-              icon={<DollarIcon />}
-            />
-            <StatCard
-              title="This Month"
-              value="$520"
-              change={{ value: 24, type: 'increase' }}
-              icon={<TrendingUpIcon />}
-            />
-             <StatCard
-              title="Total Referrals"
-              value={stats.referrals}
-              icon={<UsersIcon />}
-            />
-            <StatCard
-              title="Conversion Rate"
-              value={`${stats.conversionRate}%`}
-              icon={<ChartBarIcon />}
-            />
+            <div className="frosted-card p-4">
+              <p className="sub-dense">Total Earnings</p>
+              <h3 className="text-2xl font-bold text-green-500">${stats.earnings.toLocaleString()}</h3>
+            </div>
+            <div className="frosted-card p-4">
+              <p className="sub-dense">Active Referrals</p>
+              <h3 className="text-2xl font-bold">{stats.referrals}</h3>
+            </div>
+            <div className="frosted-card p-4">
+              <p className="sub-dense">Monthly Clicks</p>
+              <h3 className="text-2xl font-bold">{stats.clicks}</h3>
+            </div>
+            <div className="frosted-card p-4">
+              <p className="sub-dense">Conv. Rate</p>
+              <h3 className="text-2xl font-bold text-orange-500">{stats.conversionRate}%</h3>
+            </div>
           </div>
 
           {/* Main Content */}
@@ -95,37 +80,74 @@ export default async function AffiliateDashboard() {
             
             {/* Left Col - Links & Assets */}
             <div className="lg:col-span-2 space-y-6">
-               <div className="bg-card border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 shadow-sm">
-                 <h3 className="font-semibold text-foreground mb-4">Your Referral Links</h3>
-                 <div className="space-y-4">
-                   <div className="p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-lg border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-4">
+              <div className="frosted-card p-1">
+                 <div className="p-4 border-b border-white/10">
+                    <h3 className="font-bold text-xs tracking-widest uppercase">Your Global Referral Links</h3>
+                 </div>
+                 <div className="p-4 space-y-3">
+                   <div className="p-3 bg-white/5 border border-white/5 rounded-lg flex items-center justify-between gap-4">
                      <div className="min-w-0">
-                       <p className="text-sm font-medium text-foreground">Default Store Link</p>
-                       <p className="text-xs text-neutral-500 truncate">thesteepcircle.com/ref/{user?.username || 'partner'}</p>
+                       <p className="font-bold text-[10px] uppercase tracking-widest text-orange-500">Main Community Link</p>
+                       <p className="text-xs truncate text-muted font-mono">thesteepcircle.com/ref/{user?.username || 'partner'}</p>
                      </div>
-                     <LinkButton href="#" variant="secondary" size="sm">Copy</LinkButton>
+                     <button className="px-3 py-1 bg-white/10 hover:bg-white/20 text-[10px] font-bold uppercase tracking-widest rounded-md border border-white/10 transition-colors">Copy</button>
+                   </div>
+                   <div className="p-3 bg-white/5 border border-white/5 rounded-lg flex items-center justify-between gap-4">
+                     <div className="min-w-0">
+                       <p className="font-bold text-[10px] uppercase tracking-widest text-blue-500">Course Bundle Link</p>
+                       <p className="text-xs truncate text-muted font-mono">thesteepcircle.com/courses?ref={user?.username || 'partner'}</p>
+                     </div>
+                     <button className="px-3 py-1 bg-white/10 hover:bg-white/20 text-[10px] font-bold uppercase tracking-widest rounded-md border border-white/10 transition-colors">Copy</button>
                    </div>
                  </div>
-               </div>
+              </div>
+
+              <div className="space-y-4">
+                 <h2 className="h2-dense italic">Promotional Assets</h2>
+                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="aspect-square frosted-card flex flex-col items-center justify-center p-4 group cursor-pointer">
+                         <div className="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center text-xl mb-2 group-hover:scale-110 transition-transform">🖼️</div>
+                         <span className="text-[10px] font-bold uppercase text-muted">Graphic 0{i}</span>
+                      </div>
+                    ))}
+                 </div>
+              </div>
             </div>
 
-            {/* Right Col - Recent Activity */}
+            {/* Right Col - Payouts/Activity */}
             <div className="space-y-6">
-              <div className="bg-card border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 shadow-sm">
-                <h3 className="font-semibold text-foreground mb-4">Recent Referrals</h3>
+              <div className="frosted-card p-5">
+                <h3 className="h2-dense mb-4 italic">Next Payout</h3>
                 <div className="space-y-4">
-                  {[1, 2, 3].map((_, i) => (
-                    <div key={i} className="flex items-center justify-between text-sm">
+                   <div className="flex justify-between items-end">
+                      <span className="text-3xl font-bold tracking-tight text-white">$420.00</span>
+                      <span className="badge-frosted badge-blue">Processing</span>
+                   </div>
+                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Estimated: Feb 1st, 2026</p>
+                   <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500 w-[70%]" />
+                   </div>
+                   <button className="w-full btn-vibrant text-xs py-2 mt-2">Manage Payouts</button>
+                </div>
+              </div>
+
+              <div className="frosted-card overflow-hidden">
+                <div className="p-4 bg-white/5 border-b border-white/10 flex justify-between items-center">
+                  <h3 className="font-bold text-xs tracking-widest uppercase">Referral History</h3>
+                  <span className="text-[10px] font-bold text-orange-500 italic">Live Feed</span>
+                </div>
+                <div className="divide-y divide-white/5">
+                  {[1, 2, 3, 4].map((_, i) => (
+                    <div key={i} className="px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center font-bold">
-                          $
-                        </div>
+                        <div className="w-6 h-6 rounded-md bg-green-500/10 border border-green-500/20 flex items-center justify-center text-[10px] text-green-500 font-bold">$</div>
                         <div>
-                          <p className="font-medium text-foreground">Commission Earned</p>
-                          <p className="text-xs text-neutral-500">Product Sale</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest">Sale #{(i+2341).toString()}</p>
+                          <p className="text-[9px] text-muted leading-none">Standard Membership</p>
                         </div>
                       </div>
-                      <span className="font-medium text-green-600 dark:text-green-400">+$15.00</span>
+                      <span className="text-[10px] font-bold text-green-500">+$15.00</span>
                     </div>
                   ))}
                 </div>
@@ -138,9 +160,3 @@ export default async function AffiliateDashboard() {
     </div>
   );
 }
-
-// Icons
-function DollarIcon() { return <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>; }
-function TrendingUpIcon() { return <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>; }
-function UsersIcon() { return <svg className="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>; }
-function ChartBarIcon() { return <svg className="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>; }

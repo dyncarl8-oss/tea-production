@@ -26,14 +26,16 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased selection:bg-orange-500/30`}
 			>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
+					defaultTheme="dark"
 					enableSystem
 					disableTransitionOnChange
 				>
+					<div className="bg-glow-orange" />
+					<div className="bg-glow-blue" />
 					{children}
 				</ThemeProvider>
 			</body>
