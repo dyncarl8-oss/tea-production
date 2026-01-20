@@ -2,12 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Button, LinkButton } from '@/components/Button';
-import { Card } from '@/components/Card';
-import { Badge } from '@/components/Badge';
-import { Progress } from '@/components/Progress';
 
-// This would normally come from props/database
+// Mock data (would be dynamic in real app)
 const mockLesson = {
   id: 'hf-1',
   courseId: 'herbal-foundations',
@@ -23,259 +19,124 @@ const mockLesson = {
     { id: 'r2', name: 'Herb Reference Sheet', type: 'pdf' as const, url: '/resources/herbs.pdf' },
   ],
   isPreview: true,
-  transcript: `Welcome to Herbal Foundations! 
-
-In this course, we're going to explore the incredible world of herbal wellness together. 
-
-For thousands of years, people around the world have turned to plants for healing. In the Caribbean, this tradition runs deep - passed down through generations, blending knowledge from Africa, India, and indigenous peoples.
-
-Today, we're seeing a renaissance in herbal wellness. More and more people are looking for natural ways to support their health, reduce stress, improve sleep, and boost their energy.
-
-In this course, you'll learn:
-- The basic principles of herbal medicine
-- How to select the right herbs for your needs  
-- Proper brewing techniques
-- How to create sustainable wellness rituals
-
-Let's begin this journey together. I'm excited to share this knowledge with you!`,
-};
-
-const mockNextLesson = {
-  id: 'hf-2',
-  title: 'Understanding Herbs & Their Benefits',
+  transcript: `Welcome to Herbal Foundations! \n\nIn this course, we're going to explore the incredible world of herbal wellness together. \n\nFor thousands of years, people around the world have turned to plants for healing. In the Caribbean, this tradition runs deep - passed down through generations, blending knowledge from Africa, India, and indigenous peoples.\n\nToday, we're seeing a renaissance in herbal wellness. More and more people are looking for natural ways to support their health, reduce stress, improve sleep, and boost their energy.\n\nIn this course, you'll learn:\n- The basic principles of herbal medicine\n- How to select the right herbs for your needs  \n- Proper brewing techniques\n- How to create sustainable wellness rituals\n\nLet's begin this journey together. I'm excited to share this knowledge with you!`,
 };
 
 export default function LessonPage() {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const [completed, setCompleted] = useState(false);
-  const [notes, setNotes] = useState('');
-
-  const handleMarkComplete = () => {
-    setCompleted(true);
-    // In real app, this would save to database
-  };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Top Navigation */}
-      <header className="bg-white border-b border-neutral-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <LinkButton href={`/circle/courses/${mockLesson.courseId}`} variant="ghost">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Course
-            </LinkButton>
-            
-            <div className="text-center">
-              <p className="text-sm text-neutral-500">{mockLesson.courseName}</p>
-              <p className="font-medium text-neutral-900">Lesson {mockLesson.order}</p>
-            </div>
-
-            <Button 
-              variant={completed ? 'secondary' : 'primary'}
-              onClick={handleMarkComplete}
-              disabled={completed}
-            >
-              {completed ? '✓ Completed' : 'Mark Complete'}
-            </Button>
+    <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-500">
+      {/* Top Header */}
+      <header className="h-16 border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-6">
+        <Link 
+          href={`/circle/courses`} 
+          className="flex items-center gap-2 group transition-all"
+        >
+          <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-orange-500/50">
+             <span className="text-muted group-hover:text-orange-500 transition-colors">←</span>
           </div>
+          <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-orange-500">Back To library</span>
+        </Link>
+        
+        <div className="text-center hidden md:block">
+           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-500 leading-none mb-1 italic">Now learning</p>
+           <h2 className="text-xs font-bold uppercase italic tracking-tight">{mockLesson.title}</h2>
         </div>
+
+        <button 
+          onClick={() => setCompleted(!completed)}
+          className={`btn-vibrant transition-all !py-1.5 !px-4 !text-[10px] uppercase tracking-widest ${completed ? '!from-green-500 !to-emerald-600' : ''}`}
+        >
+          {completed ? '✓ Module Done' : 'Complete Module'}
+        </button>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-8">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
+          
+          {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Video Player */}
-            <Card padding="none" className="overflow-hidden">
-              <div 
-                className="aspect-video bg-neutral-900 relative cursor-pointer group"
-                onClick={() => setIsPlaying(!isPlaying)}
-              >
-                {/* Video placeholder */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {!isPlaying ? (
-                    <div className="w-20 h-20 rounded-full bg-white/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
-                      <svg className="w-10 h-10 text-teal-600 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-
-                {/* Progress bar */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-                  <div className="h-full bg-teal-500 w-0" style={{ width: isPlaying ? '35%' : '0%' }} />
-                </div>
-
-                {/* Time overlay */}
-                <div className="absolute bottom-4 right-4 text-white/80 text-sm bg-black/50 px-2 py-1 rounded">
-                  {mockLesson.duration}:00
-                </div>
-              </div>
-
-              {/* Controls */}
-              <div className="p-4 flex items-center justify-between border-t border-neutral-100">
-                <div className="flex items-center gap-4">
-                  <button className="text-neutral-600 hover:text-neutral-900 transition-colors">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <button className="text-neutral-600 hover:text-neutral-900 transition-colors">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <button className="text-neutral-600 hover:text-neutral-900 transition-colors">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.414a5 5 0 001.414 1.414M4.929 4.929a9 9 0 000 12.728" />
-                    </svg>
-                  </button>
-                  <select className="text-sm border border-neutral-200 rounded-md px-2 py-1">
-                    <option>1x</option>
-                    <option>1.25x</option>
-                    <option>1.5x</option>
-                    <option>2x</option>
-                  </select>
-                </div>
-              </div>
-            </Card>
-
-            {/* Lesson Info */}
-            <div>
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-neutral-900 mb-2">{mockLesson.title}</h1>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="default">Lesson {mockLesson.order}</Badge>
-                    <span className="text-sm text-neutral-500">{mockLesson.duration} minutes</span>
-                    {mockLesson.isPreview && <Badge variant="info">Preview</Badge>}
+            {/* Immersive Video Holder */}
+            <div className="frosted-card aspect-video border-[4px] border-white/5 overflow-hidden group shadow-2xl relative">
+               <div className="absolute inset-0 bg-neutral-900 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full bg-orange-500 flex items-center justify-center text-white text-3xl shadow-xl shadow-orange-500/40 cursor-pointer hover:scale-110 transition-transform">
+                     ▶
                   </div>
-                </div>
-                {completed && (
-                  <Badge variant="success" className="flex-shrink-0">
-                    ✓ Completed
-                  </Badge>
-                )}
-              </div>
-              <p className="text-neutral-600">{mockLesson.description}</p>
+               </div>
+               {/* Controls Simulation */}
+               <div className="absolute bottom-0 left-0 right-0 h-12 bg-black/80 backdrop-blur-md flex items-center justify-between px-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">04:20 / 15:00</div>
+                  <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
+                     <div className="h-full bg-orange-500 w-[28%]" />
+                  </div>
+               </div>
             </div>
 
-            {/* Transcript Toggle */}
-            <Card>
-              <button 
-                className="w-full flex items-center justify-between"
-                onClick={() => setShowTranscript(!showTranscript)}
-              >
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span className="font-medium text-neutral-900">Transcript</span>
-                </div>
-                <svg 
-                  className={`w-5 h-5 text-neutral-400 transition-transform ${showTranscript ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {showTranscript && (
-                <div className="mt-4 pt-4 border-t border-neutral-200">
-                  <div className="prose prose-sm max-w-none text-neutral-600 whitespace-pre-line">
-                    {mockLesson.transcript}
+            {/* Content Details */}
+            <div className="space-y-4">
+               <div className="flex items-center gap-3">
+                  <span className="badge-frosted badge-orange uppercase text-[9px] font-black italic">Module {mockLesson.order}</span>
+                  <span className="text-[11px] font-bold text-muted uppercase tracking-[0.2em]">{mockLesson.duration} Minutes Duration</span>
+               </div>
+               <h1 className="h1-dense uppercase italic tracking-tighter text-3xl">{mockLesson.title}</h1>
+               <p className="text-sm text-muted leading-relaxed font-medium">
+                  {mockLesson.description}
+               </p>
+            </div>
+
+            {/* Interactive Transcript */}
+            <div className="frosted-card overflow-hidden">
+               <button 
+                 onClick={() => setShowTranscript(!showTranscript)}
+                 className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+               >
+                  <div className="flex items-center gap-3">
+                     <span className="text-orange-500">📄</span>
+                     <span className="text-[10px] font-black uppercase tracking-widest italic">Full Transcript {showTranscript ? '(-)' : '(+)'}</span>
                   </div>
-                </div>
-              )}
-            </Card>
+                  <span className="text-[10px] text-muted font-bold uppercase tracking-widest">Read Along</span>
+               </button>
+               {showTranscript && (
+                 <div className="p-6 border-t border-white/5 bg-black/10">
+                    <p className="text-[12px] leading-relaxed text-muted whitespace-pre-line italic font-medium">
+                       {mockLesson.transcript}
+                    </p>
+                 </div>
+               )}
+            </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar Area */}
           <div className="space-y-6">
-            {/* Next Lesson */}
-            <Card className="bg-teal-50 border-teal-200">
-              <h3 className="font-semibold text-neutral-900 mb-3">Up Next</h3>
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg mb-4">
-                <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600 font-bold">
-                  {mockLesson.order + 1}
+             {/* Resources Widget */}
+             <div className="frosted-card p-5">
+                <h3 className="font-black text-[10px] uppercase tracking-widest italic text-orange-500 mb-4">Study materials</h3>
+                <div className="space-y-3">
+                   {mockLesson.resources.map(res => (
+                     <div key={res.id} className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group cursor-pointer hover:border-orange-500/50 transition-all">
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 font-black text-[10px]">PDF</div>
+                           <p className="text-[10px] font-bold uppercase tracking-tight text-muted group-hover:text-foreground transition-colors">{res.name}</p>
+                        </div>
+                        <span className="text-[10px] text-muted group-hover:text-orange-500">↓</span>
+                     </div>
+                   ))}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-neutral-900 truncate">{mockNextLesson.title}</p>
-                  <p className="text-sm text-neutral-500">Lesson {mockLesson.order + 1}</p>
-                </div>
-              </div>
-              <LinkButton href={`/circle/lessons/${mockNextLesson.id}`} fullWidth>
-                Continue to Next Lesson
-              </LinkButton>
-            </Card>
+             </div>
 
-            {/* Resources */}
-            {mockLesson.resources.length > 0 && (
-              <Card>
-                <h3 className="font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                  Resources
-                </h3>
-                <div className="space-y-2">
-                  {mockLesson.resources.map((resource) => (
-                    <a
-                      key={resource.id}
-                      href={resource.url}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-colors"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
-                        PDF
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-neutral-900 truncate">{resource.name}</p>
-                        <p className="text-xs text-neutral-500">Click to download</p>
-                      </div>
-                      <svg className="w-5 h-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                    </a>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Notes */}
-            <Card>
-              <h3 className="font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                My Notes
-              </h3>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Take notes as you watch..."
-                className="w-full h-32 p-3 text-sm border border-neutral-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-              />
-              <p className="text-xs text-neutral-400 mt-2">Notes are saved automatically</p>
-            </Card>
+             {/* Ritual Notes Widget */}
+             <div className="frosted-card p-5 border-blue-500/10">
+                <h3 className="font-black text-[10px] uppercase tracking-widest italic text-blue-500 mb-4">Ritual notes</h3>
+                <textarea 
+                  placeholder="Capture your insights here..."
+                  className="w-full bg-white/5 border border-white/5 rounded-xl p-4 text-[11px] text-muted h-32 outline-none focus:border-blue-500/50 transition-all font-medium placeholder:italic"
+                />
+                <p className="text-[9px] font-bold uppercase tracking-widest text-muted/40 mt-3 text-right italic italic italic">Autosaving to cloud</p>
+             </div>
           </div>
+
         </div>
       </div>
     </div>
